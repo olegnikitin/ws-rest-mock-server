@@ -1,0 +1,6 @@
+{
+  "/login": {
+    "ok": {"ok": {"a": "b"}},
+    "error": {"error": {"message": "Some message"}}
+  }
+}

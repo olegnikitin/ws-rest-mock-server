@@ -11,12 +11,13 @@ docker run -p 8044:8044 -p 5080:5080 -v $HOME:/data mock-serv
 And use localhost machine as server with port 8044 for REST requests<br>
 And 5080 for WS connections
 
-Endpoints on HTTP can be added to such file as:<br>
+Endpoints on HTTP should be added to file with such:<br>
 {
   "/login": {
-    "200": {"a": "b"},
-    "400": {"error": {"message": "Some message"}}
+    "ok": {"a": "b"},
+    "error": {"error": {"message": "Some message"}}
   }
 }<br>
-Where key is endpoint and response is value. It should be located in $HOME/endpoints.js<br>
-F.e. http://localhost:8044/login?code=200 will return you {"a":"b"}
+Where key is endpoint and response is value. It should be located in $HOME.
+File examples are in folder named examples<br>
+F.e. http://localhost:8044/login?result=ok will return you {"a":"b"}

@@ -1,24 +1,7 @@
 import WebSocket from 'ws';
-import fs from "fs";
+import Utils from "./utils.mjs"
 
-const path = '/data/endpoints.json';
-
-let endpointsFile;
-
-try {
-    if (fs.existsSync(process.env['HOME'] + '/endpoints.json')) {//local
-        endpointsFile = fs.readFileSync(process.env['HOME'] + '/endpoints.json', {encoding: 'utf8'});
-    } else if (fs.existsSync(path)) {//docker
-        endpointsFile = fs.readFileSync(path, {encoding: 'utf8'});
-    } else {
-        console.error("There are no such file with endpoints like it's required");
-        process.exit(1);
-    }
-} catch(err) {
-    console.error(err)
-}
-
-const endpoints = JSON.parse(endpointsFile);
+const wsFile = Utils.readFile('ws.json');
 
 const wss = new WebSocket.Server({
     port: 5080,
@@ -53,10 +36,18 @@ wss.on('connection', function connection(ws) {
             return;
         }
         const endpoint = data.e;
-        const code = data.payload && data.payload.code || 200;
+        const param = (data.payload && wsFile[endpoint][data.payload.result]) || null;
+        if (param) {
+            return ws.send(JSON.stringify({
+                e: endpoint,
+                data: param
+            }));
+        }
         ws.send(JSON.stringify({
             e: endpoint,
-            data: endpoints[endpoint][code]
+            data: {
+                error: "There are no such WS endpoint or param"
+            }
         }));
     });
 
@@ -75,6 +66,7 @@ wss.on('connection', function connection(ws) {
 });
 
 export default function () {
+    console.log(`Available WSs: ${Object.keys(wsFile)}`);
     console.log('WS started');
     return wss;
 }

@@ -1,43 +1,32 @@
 import express from 'express';
-import fs from "fs";
+import Utils from "./utils.mjs";
 
-const path = '/data/endpoints.json';
-
-let endpointsFile;
-
-try {
-    if (fs.existsSync(process.env['HOME'] + '/endpoints.json')) {//local
-        endpointsFile = fs.readFileSync(process.env['HOME'] + '/endpoints.json', {encoding: 'utf8'});
-    } else if (fs.existsSync(path)) {//docker
-        endpointsFile = fs.readFileSync(path, {encoding: 'utf8'});
-    } else {
-        console.error("There are no such file with endpoints like it's required");
-        process.exit(1);
-    }
-} catch(err) {
-    console.error(err)
-}
-
-const endpoints = JSON.parse(endpointsFile);
+const endpoints = Utils.readFile('rest.json');
 
 const app = express();
 
 for (let key in endpoints) {
     app.post(key, function (req, res) {
         const value = endpoints[key];
-        const code = (req.query && req.query.code) || 200;
-        res.send(value[code]);
+        const reqParam = (req.query && req.query.result) || null;
+        if (reqParam && value[reqParam]) {
+            return res.send(value[reqParam]);
+        }
+        res.status(400).send({error: "No such param"})
     });
     app.get(key, function (req, res) {
         const value = endpoints[key];
-        const code = (req.query && req.query.code) || 200;
-        res.send(value[code]);
+        const reqParam = (req.query && req.query.result) || null;
+        if (reqParam && value[reqParam]) {
+            return res.send(value[reqParam]);
+        }
+        res.status(400).send({error: "There are no such param"})
     });
 }
 
 export default function () {
     return app.listen(8044, function () {
+        console.log(`Available endpoints: ${Object.keys(endpoints)}`);
         console.log('Rest started');
-        console.log(`Available endpoints: ${Object.keys(JSON.parse(endpointsFile))}`);
     });
 }
