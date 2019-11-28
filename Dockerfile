@@ -3,11 +3,9 @@ FROM node:12.2-alpine
 # Create app directory
 WORKDIR /usr/src/app
 
-#COPY package*.json ./
-#COPY .npmrc .
+COPY package*.json ./
 RUN npm install
 RUN mkdir /data
-#RUN chown -RP node
 COPY . .
 
 USER node
