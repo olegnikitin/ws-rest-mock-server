@@ -4,7 +4,8 @@
   "description": "REST + WS mock server",
   "main": "index.mjs",
   "scripts": {
-    "start": "node --experimental-modules index"
+    "start": "node --experimental-modules index",
+    "test": "mocha ./tests"
   },
   "optionalDependencies": {
     "utf-8-validate": "^5.0.2",
@@ -13,6 +14,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "ws": "^7.1.1"
+  },
+  "devDependencies": {
+    "mocha": "^6.2.2"
   },
   "keywords": [
     "WS",
@@ -27,4 +31,3 @@
   },
   "engineStrict": true
 }
-
